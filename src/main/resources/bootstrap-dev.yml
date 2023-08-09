@@ -1,0 +1,12 @@
+spring:
+  cloud:
+    nacos:
+      discovery:
+        server-addr: localhost:8848
+        namespace: sys-${spring.profiles.actvie:dev}
+        ip: ${nacos.host:192.168.0.1}
+      config:
+        server-addr: localhost:8848
+        namespace: tiny-oss-service
+        file-extension: yaml
+        shared-dataids: env.yaml
