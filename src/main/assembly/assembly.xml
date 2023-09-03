@@ -15,7 +15,7 @@
             <outputDirectory>lib</outputDirectory>
             <fileMode>0755</fileMode>
         </fileSet>
-       
+
         <fileSet>
             <directory>${basedir}/target</directory>
             <outputDirectory>${file.separator}</outputDirectory>

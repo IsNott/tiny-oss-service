@@ -1,6 +1,11 @@
 package com.nott.file.controller;
 
+import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.nott.common.CommonPageService;
 import com.nott.common.R;
+import com.nott.file.entity.SysMinioFile;
 import com.nott.file.service.FileService;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -20,6 +25,8 @@ public class FileController {
 
     @Resource
     private FileService fileService;
+    @Resource
+    private CommonPageService<SysMinioFile> commonPageService;
 
     @PostMapping("upload")
     public R fileUpload(@RequestParam("file") MultipartFile file, String holderCode) throws Exception {
@@ -46,4 +53,26 @@ public class FileController {
         fileService.downloadFileById(id,response);
         return R.ok();
     }
+
+    @PostMapping("page")
+    public R page(@RequestBody JSONObject req) {
+        QueryWrapper<SysMinioFile> wrapper = null;
+        try {
+            wrapper = commonPageService.initMbpWrapper(req);
+        } catch (Exception e) {
+            return R.failure(e.getMessage());
+        }
+        return R.okData(fileService.page(new Page<>(),wrapper));
+
+    }
+
+//    @PostMapping("batchUpload")
+//    public R batchUpload(@RequestBody JSONObject req){
+//        try {
+//            fileService.batchUploadMovieImagesDir(req.getString("path"));
+//        } catch (Exception e) {
+//            return R.failure(e.getMessage());
+//        }
+//        return R.ok();
+//    }
 }
