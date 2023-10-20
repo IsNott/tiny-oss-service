@@ -11,7 +11,7 @@ import org.springframework.context.annotation.ComponentScan;
  * @Date 2023/8/7
  */
 
-@EnableFeignClients
+@EnableFeignClients(basePackages = "com.nott")
 @EnableDiscoveryClient
 @SpringBootApplication
 @EnableAutoConfiguration

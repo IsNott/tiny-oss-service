@@ -1,5 +1,9 @@
 package com.nott.common;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.io.Serializable;
 
 /**
@@ -7,79 +11,50 @@ import java.io.Serializable;
  * @Date 2023/8/8
  */
 
-
-public class R implements Serializable {
-    private String code;
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class R<T extends Object> implements Serializable {
+    private int code;
     private String msg;
-    private Object obj;
+    private T obj;
 
-    public R(String code, String msg, Object obj) {
-        this.code = code;
+    public R(String msg, T obj) {
         this.msg = msg;
         this.obj = obj;
     }
 
-    public R() {
+    public R(int code, String msg) {
+        this.code = code;
+        this.msg = msg;
     }
 
+    public R(String msg) {
+        this.msg = msg;
+    }
 
     public static R okData(String msg, Object obj) {
-        R result = new R();
-        result.setCode("200");
-        result.setMsg(msg);
-        result.setObj(obj);
-        return result;
+        return new R<>(msg, obj);
     }
 
     public static R ok(String msg) {
-        R result = new R();
-        result.setCode("200");
-        result.setMsg(msg);
-        return result;
+        return new R<>(msg);
     }
 
     public static R ok() {
-        return ok("success");
+        return new R("success");
     }
 
     public static R okData(Object obj) {
-        R result = new R();
-        result.setCode("200");
-        result.setMsg("success");
-        result.setObj(obj);
-        return result;
+        return new R<>(200, "success", obj);
     }
 
     public static R failure(String msg) {
-        R result = new R();
-        result.setCode("-999");
-        result.setMsg(msg);
-        return result;
+        return new R<>(200, msg);
     }
 
-
-    public String getCode() {
-        return code;
-    }
-
-    public void setCode(String code) {
-        this.code = code;
-    }
-
-    public String getMsg() {
-        return msg;
-    }
-
-    public void setMsg(String msg) {
-        this.msg = msg;
-    }
-
-    public Object getObj() {
-        return obj;
-    }
-
-    public void setObj(Object obj) {
-        this.obj = obj;
+    public static R failure() {
+        return new R<>(200, "fail");
     }
 }
 

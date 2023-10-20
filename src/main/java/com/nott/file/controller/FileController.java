@@ -37,7 +37,7 @@ public class FileController {
     }
 
     @PostMapping("preview/{id}")
-    public R fileUpload(@NotNull @PathVariable("id") String id) throws Exception {
+    public R preview(@NotNull @PathVariable("id") String id) throws Exception {
         String url = fileService.preview(id);
         return R.okData(url);
     }
