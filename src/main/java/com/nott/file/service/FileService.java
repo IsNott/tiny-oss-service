@@ -42,10 +42,6 @@ public class FileService extends ServiceImpl<SysMinioFileMapper, SysMinioFile> {
     private MinioTemplate minioTemplate;
     @Resource
     private MinioProp minioProp;
-    @Resource
-    private ThreadPoolContext threadPoolContext;
-    @Resource
-    private ImagesServiceClient imagesServiceClient;
 
     @Transactional(rollbackFor = Exception.class)
     public SysMinioFile uploadFile(MultipartFile file, String holderCode) throws Exception {

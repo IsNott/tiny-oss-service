@@ -3,13 +3,17 @@ package com.nott.minio;
 import com.nott.minio.propertie.MinioProp;
 import io.minio.*;
 import io.minio.http.Method;
+import net.coobird.thumbnailator.Thumbnails;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
-
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLEncoder;
@@ -28,15 +32,17 @@ public class MinioTemplate {
 
     @Resource
     private MinioProp minioProp;
+    @Value("${upload.maxSize}")
+    private long maxSize;
 
-    public MinioClient getClient() throws Exception{
-        if(this.client == null){
+    public MinioClient getClient() throws Exception {
+        if (this.client == null) {
             MinioClient minioClient =
                     MinioClient.builder()
-                            .endpoint(minioProp.getUrl(),minioProp.getPort(),false)
+                            .endpoint(minioProp.getUrl(), minioProp.getPort(), false)
                             .credentials(minioProp.getUsername(), minioProp.getPassword())
                             .build();
-            if(minioClient == null){
+            if (minioClient == null) {
                 throw new RuntimeException("链接远程Minio服务端失败");
             }
             this.client = minioClient;
@@ -44,34 +50,76 @@ public class MinioTemplate {
         boolean found = client.bucketExists(BucketExistsArgs.builder().bucket(minioProp.getBucket()).build());
         if (!found) {
             // Make a new bucket called 'asiatrip'.
-            throw new RuntimeException(String.format("没有找到Bucket：[%s]",minioProp.getBucket()));
+            throw new RuntimeException(String.format("没有找到Bucket：[%s]", minioProp.getBucket()));
         }
         return this.client;
     }
 
-    public String upload(MultipartFile file,String holderCode) throws Exception{
-        if(file == null){
+    public String upload(MultipartFile file, String holderCode) throws Exception {
+        if (file == null) {
             throw new RuntimeException("文件不能为空");
         }
+
+        boolean isPic = this.isPicture(file);
         String filePath = "";
         String uuidFileName = UUID.randomUUID().toString();
-        if(StringUtils.isNotEmpty(holderCode)){
+        if (StringUtils.isNotEmpty(holderCode)) {
             filePath = holderCode + "/" + uuidFileName;
-        }else {
+        } else {
             filePath = uuidFileName;
         }
         MinioClient minioClient = getClient();
+        // 如果是图片则压缩
+        if (isPic) {
+            file = this.handlePicCompress(file);
+        }
         InputStream inputStream = file.getInputStream();
         minioClient.putObject(
                 PutObjectArgs.builder().bucket(minioProp.getBucket()).object(filePath)
                         .contentType(file.getContentType())
                         .stream(
-                        inputStream, inputStream.available(), -1)
+                                inputStream, inputStream.available(), -1)
                         .build());
         return uuidFileName;
     }
 
-    public String getPreviewUrl(String fileName) throws Exception{
+    private MultipartFile handlePicCompress(MultipartFile file) throws Exception {
+        if (file.getSize() > maxSize) {
+            String surffix = file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf("."));
+            String fileName = StringUtils.isNotEmpty(file.getName()) ? file.getName() : UUID.randomUUID().toString().replaceAll("-", "");
+            String path = System.getProperty("java.io.tmpdir") + File.separator;
+            // 在项目根目录下的 upload 目录中生成临时文件
+            File newFile = new File(path + UUID.randomUUID().toString() + "." + surffix);
+            // 小于 1M 的
+            if ((1024 * 1024 * 0.1) <= file.getSize() && file.getSize() <= (1024 * 1024)) {
+                Thumbnails.of(file.getInputStream()).scale(1f).outputQuality(0.3f).toFile(newFile);
+            }
+            // 1 - 2M 的
+            else if ((1024 * 1024) < file.getSize() && file.getSize() <= (1024 * 1024 * 2)) {
+                Thumbnails.of(file.getInputStream()).scale(1f).outputQuality(0.2f).toFile(newFile);
+            }
+            // 2M 以上的
+            else if ((1024 * 1024 * 2) < file.getSize()) {
+                Thumbnails.of(file.getInputStream()).scale(1f).outputQuality(0.1f).toFile(newFile);
+            }
+            // 获取输入流
+            FileInputStream input = new FileInputStream(newFile);
+            // 转为 MultipartFile
+            return new MockMultipartFile(fileName, file.getOriginalFilename(), file.getContentType(), input);
+        } else {
+            return file;
+        }
+    }
+
+    private boolean isPicture(MultipartFile file) {
+        String contentType = file.getContentType();
+        if (contentType.contains("image/")) {
+            return true;
+        }
+        return false;
+    }
+
+    public String getPreviewUrl(String fileName) throws Exception {
         MinioClient client = this.getClient();
         String url =
                 client.getPresignedObjectUrl(
@@ -85,13 +133,13 @@ public class MinioTemplate {
         return url;
     }
 
-    public void removeObject(String filePath) throws Exception{
+    public void removeObject(String filePath) throws Exception {
         MinioClient client = this.getClient();
         client.removeObject(
                 RemoveObjectArgs.builder().bucket(minioProp.getBucket()).object(filePath).build());
     }
 
-    public void download(String filePath, String fileName,HttpServletResponse response) throws Exception{
+    public void download(String filePath, String fileName, HttpServletResponse response) throws Exception {
         MinioClient client = this.getClient();
         // 创建输入流
         InputStream is = null;
