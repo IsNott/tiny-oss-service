@@ -36,7 +36,7 @@ public class FileController {
         return R.okData(fileService.uploadFile(file, holderCode));
     }
 
-    @PostMapping("preview/{id}")
+    @RequestMapping("preview/{id}")
     public R preview(@NotNull @PathVariable("id") String id) throws Exception {
         String url = fileService.preview(id);
         return R.okData(url);
