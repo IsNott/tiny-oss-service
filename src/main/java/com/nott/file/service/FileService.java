@@ -1,32 +1,20 @@
 package com.nott.file.service;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-import com.alibaba.nacos.common.util.UuidUtils;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.nott.common.R;
-import com.nott.common.ThreadPoolContext;
-import com.nott.feign.ImagesServiceClient;
 import com.nott.file.entity.SysMinioFile;
 import com.nott.file.mapper.SysMinioFileMapper;
 import com.nott.minio.MinioTemplate;
 import com.nott.minio.propertie.MinioProp;
-import com.nott.movie.entity.SysMovieInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.http.MediaType;
-import org.springframework.http.MediaTypeFactory;
-import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.io.FileInputStream;
+
 import java.util.*;
 
 /**

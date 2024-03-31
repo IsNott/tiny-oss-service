@@ -3,3 +3,5 @@ server:
 spring:
   application:
     name: tiny-oss-service
+  profiles:
+    active: dev

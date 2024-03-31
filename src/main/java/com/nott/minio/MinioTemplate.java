@@ -34,6 +34,8 @@ public class MinioTemplate {
     private MinioProp minioProp;
     @Value("${upload.maxSize}")
     private long maxSize;
+    @Value("${upload.compress}")
+    private boolean compress;
 
     public MinioClient getClient() throws Exception {
         if (this.client == null) {
@@ -70,7 +72,7 @@ public class MinioTemplate {
         }
         MinioClient minioClient = getClient();
         // 如果是图片则压缩
-        if (isPic) {
+        if (isPic && compress) {
             file = this.handlePicCompress(file);
         }
         InputStream inputStream = file.getInputStream();
@@ -89,7 +91,7 @@ public class MinioTemplate {
             String fileName = StringUtils.isNotEmpty(file.getName()) ? file.getName() : UUID.randomUUID().toString().replaceAll("-", "");
             String path = System.getProperty("java.io.tmpdir") + File.separator;
             // 在项目根目录下的 upload 目录中生成临时文件
-            File newFile = new File(path + UUID.randomUUID().toString() + "." + surffix);
+            File newFile = new File(path + UUID.randomUUID().toString() + surffix);
             // 小于 1M 的
             if ((1024 * 1024 * 0.1) <= file.getSize() && file.getSize() <= (1024 * 1024)) {
                 Thumbnails.of(file.getInputStream()).scale(1f).outputQuality(0.3f).toFile(newFile);

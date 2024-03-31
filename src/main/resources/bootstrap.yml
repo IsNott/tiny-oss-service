@@ -1,0 +1,13 @@
+spring:
+  cloud:
+    nacos:
+      discovery:
+        server-addr: localhost:8848
+        namespace: tiny-oss-service
+        ip: ${nacos.host:127.0.0.1}
+      config:
+        server-addr: localhost:8848
+        namespace: tiny-oss-service
+        file-extension: yaml
+        group: DEFAULT_GROUP
+#        shared-dataids: env.yaml
