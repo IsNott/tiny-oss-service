@@ -50,11 +50,11 @@ public class R<T extends Object> implements Serializable {
     }
 
     public static R failure(String msg) {
-        return new R<>(200, msg);
+        return new R<>(-999, msg);
     }
 
     public static R failure() {
-        return new R<>(200, "fail");
+        return new R<>(-999, "fail");
     }
 }
 

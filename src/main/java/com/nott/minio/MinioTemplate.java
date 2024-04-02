@@ -1,11 +1,14 @@
 package com.nott.minio;
 
+import com.nott.file.controller.FileController;
 import com.nott.minio.propertie.MinioProp;
 import io.minio.*;
 import io.minio.http.Method;
 import net.coobird.thumbnailator.Thumbnails;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.stereotype.Component;
@@ -28,8 +31,9 @@ import java.util.concurrent.TimeUnit;
 @Component
 public class MinioTemplate {
 
-    private MinioClient client;
+    private final Logger log = LoggerFactory.getLogger(MinioTemplate.class);
 
+    private MinioClient client;
     @Resource
     private MinioProp minioProp;
     @Value("${upload.maxSize}")
@@ -82,6 +86,7 @@ public class MinioTemplate {
                         .stream(
                                 inputStream, inputStream.available(), -1)
                         .build());
+        log.info("File {},Upload Bucket {}", uuidFileName, minioProp.getBucket());
         return uuidFileName;
     }
 
