@@ -13,6 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 /**
  * @author Nott
@@ -40,6 +41,12 @@ public class FileController {
     public R preview(@NotNull @PathVariable("id") String id) throws Exception {
         String url = fileService.preview(id);
         return R.okData(url);
+    }
+
+    @PostMapping("preview")
+    public R preview(@NotNull @RequestBody List<String> ids) throws Exception {
+        List<String> urls = fileService.preview(ids);
+        return R.okData(urls);
     }
 
     @PostMapping("delById/{id}")

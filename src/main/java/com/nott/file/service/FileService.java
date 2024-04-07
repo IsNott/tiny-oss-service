@@ -80,6 +80,17 @@ public class FileService extends ServiceImpl<SysMinioFileMapper, SysMinioFile> {
         minioTemplate.download(query, sysMinioFile.getOriginName(), response);
     }
 
+    public List<String> preview(List<String> ids) throws Exception{
+        List<String> urls = new ArrayList<>();
+        if(!ids.isEmpty()){
+            for (String id : ids) {
+                String preview = this.preview(id);
+                urls.add(preview);
+            }
+        }
+        return urls;
+    }
+
 //    @Transactional(rollbackFor = Exception.class)
 //    public void batchUploadMovieImagesDir(String localPath) throws Exception {
 //        File file = new File(localPath);
