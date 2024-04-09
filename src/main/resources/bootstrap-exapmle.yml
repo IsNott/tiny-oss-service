@@ -17,6 +17,7 @@ minio:
   username: admin
   password: 12345678
   bucket: plog
+  autocreate: false
 
 upload:
   maxSize: 1000

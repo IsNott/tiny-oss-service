@@ -41,6 +41,9 @@ public class MinioTemplate {
     @Value("${upload.compress}")
     private boolean compress;
 
+    @Value("${minio.autocreate}")
+    public boolean autoCreate;
+
     public MinioClient getClient() throws Exception {
         if (this.client == null) {
             MinioClient minioClient =
@@ -55,9 +58,14 @@ public class MinioTemplate {
         }
         boolean found = client.bucketExists(BucketExistsArgs.builder().bucket(minioProp.getBucket()).build());
         if (!found) {
-            // Make a new bucket called 'asiatrip'.
-            throw new RuntimeException(String.format("没有找到Bucket：[%s]", minioProp.getBucket()));
+            if (autoCreate) {
+                client.makeBucket(MakeBucketArgs.builder().bucket(minioProp.getBucket()).build());
+                log.info("Auto make bucket: {}", minioProp.getBucket());
+            } else {
+                throw new RuntimeException(String.format("没有找到Bucket：[%s]", minioProp.getBucket()));
+            }
         }
+
         return this.client;
     }
 
