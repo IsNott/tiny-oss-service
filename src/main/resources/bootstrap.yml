@@ -2,11 +2,11 @@ spring:
   cloud:
     nacos:
       discovery:
-        server-addr: localhost:8848
+        server-addr: localhost:18848
         namespace: public
         ip: ${nacos.host:127.0.0.1}
       config:
-        server-addr: localhost:8848
+        server-addr: localhost:18848
         namespace: tiny-oss-service
         file-extension: yaml
         group: DEFAULT_GROUP

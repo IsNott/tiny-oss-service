@@ -38,7 +38,6 @@
             <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level ${PID:-} --- [%t] %logger{50} - %msg%n</pattern>
         </encoder>
     </appender>
-    <!--修改未自己的mapper-->
     <logger name="com.nott.**.mapper.**Mapper" level="info" />
     <!--myibatis log configure-->
     <logger name="com.apache.ibatis" level="TRACE"/>
@@ -47,7 +46,7 @@
     <logger name="java.sql.PreparedStatement" level="DEBUG"/>
 
     <!-- 默认日志输出级别 -->
-    <root level="DEBUG">
+    <root level="INFO">
         <appender-ref ref="STDOUT" />
         <appender-ref ref="INFO_FILE" />
     </root>
